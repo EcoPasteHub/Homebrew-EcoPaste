@@ -1,0 +1,1 @@
+专为 [EcoPaste](https://github.com/ayangweb/EcoPaste) 服务的 HomeBrew 安装方式！
