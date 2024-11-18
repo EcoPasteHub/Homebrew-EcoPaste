@@ -1,12 +1,12 @@
 cask "ecopaste" do
-    version "0.3.0"
+    version "0.4.0"
   
     if Hardware::CPU.intel?
       url "https://gh-proxy.com/https://github.com/EcoPasteHub/EcoPaste/releases/latest/download/EcoPaste_x64.app.tar.gz"
-      sha256 "0c8c25417b9fdfb741973c81c982197b112e6824a46e809c4c4592cde4088621"
+      sha256 "8d7df414488d4bb43f1ebe54cb553a702a008e81c805b13d2f7490503ba739f6"
     else
       url "https://gh-proxy.com/https://github.com/EcoPasteHub/EcoPaste/releases/latest/download/EcoPaste_aarch64.app.tar.gz"
-      sha256 "0131c7eb2007bef8f6ce9f1a420aba7be6b54bebb5e55618702ad6c66d0082d4"
+      sha256 "8230202b9758affd13e46a9e526155b906b17adf8b38c3b8dec99d1b252b41fc"
     end
   
     name "EcoPaste"
