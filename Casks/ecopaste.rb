@@ -1,9 +1,9 @@
 cask "ecopaste" do
   arch arm: "aarch64", intel: "x64"
 
-  version "0.5.0"
-  sha256 arm:   "b4f7f6eab80c9d54591fffdce20a602ffbb64641f393cf41c4588b2055d158b5",
-         intel: "adc0550f8ffbe37215eeab05f2851ce6b0a8e636518df882a720e06620459876"
+  version "0.6.0-beta.3"
+  sha256 arm:   "9712ef1f213f4d4e4a06684ff32ca96c2068dc8957f490928700069f7655d858",
+         intel: "c0f037ca6bc81af15129bec4987309944a88b9de6c996a588fd0b88c555a04be"
 
   url "https://github.com/EcoPasteHub/EcoPaste/releases/download/v#{version}/EcoPaste_#{arch}.app.tar.gz"
   name "EcoPaste"
