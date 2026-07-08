@@ -59,8 +59,8 @@ jobs:
           version=${{ steps.release.outputs.version }}
           base="https://github.com/EcoPasteHub/EcoPaste/releases/download/v${version}"
 
-          curl -L -o x64.tar.gz "$base/EcoPaste_x64.app.tar.gz"
-          curl -L -o arm.tar.gz "$base/EcoPaste_aarch64.app.tar.gz"
+          curl -L -o x64.tar.gz "$base/EcoPaste_${version}_x64.app.tar.gz"
+          curl -L -o arm.tar.gz "$base/EcoPaste_${version}_aarch64.app.tar.gz"
 
           sha_x64=$(sha256sum x64.tar.gz | awk '{print $1}')
           sha_arm=$(sha256sum arm.tar.gz | awk '{print $1}')
