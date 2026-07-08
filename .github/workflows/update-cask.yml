@@ -31,18 +31,44 @@ jobs:
                 '
           )
           version=${latest#v}
+          if [ -z "$version" ] || [ "$version" = "null" ]; then
+            echo "No matching release version found"
+            exit 1
+          fi
           echo "version=$version" >> $GITHUB_OUTPUT
 
-      - name: Read current version
+      - name: Read current cask metadata
         id: current
         run: |
-          current=$(grep -Eo 'version "[^"]+"' Casks/ecopaste.rb | sed 's/version "\(.*\)"/\1/')
-          echo "current=$current" >> $GITHUB_OUTPUT
+          version=$(sed -nE 's/^  version "([^"]+)".*/\1/p' Casks/ecopaste.rb)
+          sha_arm=$(sed -nE 's/^  sha256 arm:[[:space:]]*"([^"]+)".*/\1/p' Casks/ecopaste.rb)
+          sha_x64=$(sed -nE 's/^         intel:[[:space:]]*"([^"]+)".*/\1/p' Casks/ecopaste.rb)
+
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "sha_arm=$sha_arm" >> $GITHUB_OUTPUT
+          echo "sha_x64=$sha_x64" >> $GITHUB_OUTPUT
+
+      - name: Download and calculate sha256
+        id: sha
+        run: |
+          version=${{ steps.release.outputs.version }}
+          base="https://github.com/EcoPasteHub/EcoPaste/releases/download/v${version}"
+
+          curl -fL -o x64.tar.gz "$base/EcoPaste_${version}_x64.app.tar.gz"
+          curl -fL -o arm.tar.gz "$base/EcoPaste_${version}_aarch64.app.tar.gz"
+
+          sha_x64=$(sha256sum x64.tar.gz | awk '{print $1}')
+          sha_arm=$(sha256sum arm.tar.gz | awk '{print $1}')
+
+          echo "sha_x64=$sha_x64" >> $GITHUB_OUTPUT
+          echo "sha_arm=$sha_arm" >> $GITHUB_OUTPUT
 
       - name: Check if update needed
         id: check
         run: |
-          if [ "${{ steps.current.outputs.current }}" = "${{ steps.release.outputs.version }}" ]; then
+          if [ "${{ steps.current.outputs.version }}" = "${{ steps.release.outputs.version }}" ] \
+            && [ "${{ steps.current.outputs.sha_arm }}" = "${{ steps.sha.outputs.sha_arm }}" ] \
+            && [ "${{ steps.current.outputs.sha_x64 }}" = "${{ steps.sha.outputs.sha_x64 }}" ]; then
             echo "update=false" >> $GITHUB_OUTPUT
           else
             echo "update=true" >> $GITHUB_OUTPUT
@@ -50,23 +76,7 @@ jobs:
 
       - name: Stop if no update
         if: steps.check.outputs.update == 'false'
-        run: echo "No new version. Skip."
-
-      - name: Download and calculate sha256
-        if: steps.check.outputs.update == 'true'
-        id: sha
-        run: |
-          version=${{ steps.release.outputs.version }}
-          base="https://github.com/EcoPasteHub/EcoPaste/releases/download/v${version}"
-
-          curl -L -o x64.tar.gz "$base/EcoPaste_x64.app.tar.gz"
-          curl -L -o arm.tar.gz "$base/EcoPaste_aarch64.app.tar.gz"
-
-          sha_x64=$(sha256sum x64.tar.gz | awk '{print $1}')
-          sha_arm=$(sha256sum arm.tar.gz | awk '{print $1}')
-
-          echo "sha_x64=$sha_x64" >> $GITHUB_OUTPUT
-          echo "sha_arm=$sha_arm" >> $GITHUB_OUTPUT
+        run: echo "Version and sha256 values are unchanged. Skip."
 
       - name: Update cask file
         if: steps.check.outputs.update == 'true'
